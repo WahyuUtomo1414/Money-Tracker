@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class GoalForm
@@ -15,30 +16,35 @@ class GoalForm
     {
         return $schema
             ->components([
-                Select::make('wallet_id')
-                    ->label('Wallet')
-                    ->relationship('wallet', 'account_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                TextInput::make('name')
-                    ->label('Nama Target')
-                    ->required()
-                    ->maxLength(128),
-                Textarea::make('description')
-                    ->label('Deskripsi')
+                Section::make('Informasi Target Tabungan')
+                    ->schema([
+                        Select::make('wallet_id')
+                            ->label('Wallet')
+                            ->relationship('wallet', 'account_name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        TextInput::make('name')
+                            ->label('Nama Target')
+                            ->required()
+                            ->maxLength(128),
+                        Textarea::make('description')
+                            ->label('Deskripsi')
+                            ->columnSpanFull(),
+                        TextInput::make('target_amount')
+                            ->label('Target Nominal')
+                            ->required()
+                            ->numeric(),
+                        DatePicker::make('target_date')
+                            ->label('Target Tanggal')
+                            ->required(),
+                        Toggle::make('active')
+                            ->label('Aktif')
+                            ->required()
+                            ->default(true),
+                    ])
+                    ->columns(2)
                     ->columnSpanFull(),
-                TextInput::make('target_amount')
-                    ->label('Target Nominal')
-                    ->required()
-                    ->numeric(),
-                DatePicker::make('target_date')
-                    ->label('Target Tanggal')
-                    ->required(),
-                Toggle::make('active')
-                    ->label('Aktif')
-                    ->required()
-                    ->default(true),
             ]);
     }
 }
