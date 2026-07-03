@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Filament\Resources\Goals\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+
+class GoalsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('wallet.account_name')
+                    ->label('Wallet')
+                    ->searchable(),
+                TextColumn::make('name')
+                    ->label('Nama Target')
+                    ->searchable(),
+                TextColumn::make('target_amount')
+                    ->label('Target Nominal')
+                    ->money('IDR')
+                    ->sortable(),
+                TextColumn::make('target_date')
+                    ->label('Target Tanggal')
+                    ->date()
+                    ->sortable(),
+                IconColumn::make('active')
+                    ->label('Aktif')
+                    ->boolean(),
+                TextColumn::make('createdBy.name')
+                    ->label('Dibuat Oleh')
+                    ->badge()
+                    ->description(fn ($record) => $record->created_at?->format('d M Y H:i'))
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Dibuat Pada')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->label('Diubah Pada')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')
+                    ->label('Dihapus Pada')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('updated_by')
+                    ->label('Diubah Oleh')
+                    ->relationship('updatedBy', 'name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('deleted_by')
+                    ->label('Dihapus Oleh')
+                    ->relationship('deletedBy', 'name')
+                    ->searchable()
+                    ->preload(),
+                TrashedFilter::make(),
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+}
