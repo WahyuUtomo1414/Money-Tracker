@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransactionLedgers\Pages;
 use App\Filament\Resources\TransactionLedgers\TransactionLedgerResource;
 use App\Filament\Resources\TransactionLedgers\Widgets\TransactionLedgerOverview;
 use App\Models\Transaction;
+use App\Services\TransactionScopeService;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,7 +63,8 @@ class ListTransactionLedgers extends ListRecords
 
     protected function countByTransactionType(string $type): int
     {
-        return Transaction::query()
+        return app(TransactionScopeService::class)
+            ->scopeTransactionQuery(Transaction::query())
             ->where('transaction_type', $type)
             ->count();
     }

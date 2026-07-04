@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Transactions\Schemas;
 
 use App\Enums\TransactionTypeEnum;
+use App\Services\TransactionScopeService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -58,7 +59,7 @@ class TransactionForm
                             ->directory('transactions'),
                         Select::make('wallet_id')
                             ->label('Wallet')
-                            ->relationship('wallet', 'account_name')
+                            ->relationship('wallet', 'account_name', fn ($query) => app(TransactionScopeService::class)->scopeWalletQuery($query))
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -69,7 +70,7 @@ class TransactionForm
                             ->preload(),
                         Select::make('goal_id')
                             ->label('Target Tabungan')
-                            ->relationship('goal', 'name')
+                            ->relationship('goal', 'name', fn ($query) => app(TransactionScopeService::class)->scopeGoalQuery($query))
                             ->searchable()
                             ->preload(),
                         Hidden::make('active')

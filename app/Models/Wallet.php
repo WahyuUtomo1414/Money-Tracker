@@ -26,7 +26,8 @@ class Wallet extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'users_wallet')
-            ->using(UserWallet::class);
+            ->using(UserWallet::class)
+            ->withTimestamps();
     }
 
     public function goals(): HasMany

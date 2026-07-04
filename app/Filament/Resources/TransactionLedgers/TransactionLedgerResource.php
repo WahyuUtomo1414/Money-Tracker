@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransactionLedgers;
 use App\Filament\Resources\TransactionLedgers\Pages\ListTransactionLedgers;
 use App\Filament\Resources\TransactionLedgers\Tables\TransactionLedgersTable;
 use App\Models\TransactionLedger;
+use App\Services\TransactionScopeService;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -43,10 +44,12 @@ class TransactionLedgerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        return app(TransactionScopeService::class)->scopeTransactionLedgerQuery(
+            parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ]),
+        );
     }
 
     public static function getPages(): array
@@ -58,9 +61,11 @@ class TransactionLedgerResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
+        return app(TransactionScopeService::class)->scopeTransactionLedgerQuery(
+            parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ]),
+        );
     }
 }
