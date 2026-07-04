@@ -4,10 +4,12 @@ namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class UserForm
 {
@@ -33,6 +35,13 @@ class UserForm
                             ->password()
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->dehydrated(fn (?string $state): bool => filled($state)),
+                        Select::make('roles')
+                            ->label('Role')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn (): bool => Auth::user()?->hasRole('super_admin') ?? false),
                         FileUpload::make('avatar')
                             ->label('Avatar')
                             ->image()
