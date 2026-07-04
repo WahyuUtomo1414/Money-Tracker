@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Goals\Schemas;
 
+use App\Services\TransactionScopeService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +21,8 @@ class GoalForm
                     ->schema([
                         Select::make('wallet_id')
                             ->label('Wallet')
-                            ->relationship('wallet', 'account_name')
+                            ->relationship('wallet', 'account_name', fn ($query) => app(TransactionScopeService::class)->scopeWalletQuery($query))
+                            ->getOptionLabelFromRecordUsing(fn ($record): string => "{$record->bank_name} - {$record->account_name}")
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -33,8 +35,16 @@ class GoalForm
                             ->columnSpanFull(),
                         TextInput::make('target_amount')
                             ->label('Target Nominal')
+                            ->prefix('Rp')
+                            ->inputMode('numeric')
+                            ->formatStateUsing(fn ($state): ?string => filled($state) ? number_format((int) $state, 0, ',', '.') : null)
+                            ->afterStateUpdatedJs(<<<'JS'
+                                let value = ($state ?? '').toString().replace(/\D/g, '')
+                                $set('target_amount', value ? new Intl.NumberFormat('id-ID').format(Number(value)) : null)
+                            JS)
+                            ->dehydrateStateUsing(fn (?string $state): ?int => filled($state) ? (int) str_replace('.', '', $state) : null)
                             ->required()
-                            ->numeric(),
+                            ->rule('integer'),
                         DatePicker::make('target_date')
                             ->label('Target Tanggal')
                             ->required(),
