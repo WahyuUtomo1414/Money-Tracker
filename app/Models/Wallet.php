@@ -18,6 +18,13 @@ class Wallet extends Model
 
     protected $guarded = ['id'];
 
+    protected $appends = ['display_name'];
+
+    public function getDisplayNameAttribute(): string
+    {
+        return "{$this->bank_name} - {$this->account_name}";
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

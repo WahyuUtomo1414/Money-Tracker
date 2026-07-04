@@ -40,7 +40,7 @@ class TransactionLedgerService
             'transaction_no' => $transaction->transaction_no,
             'transaction_date' => now()->toDateString(),
             'ref_id' => $transaction->id,
-            'ref_type' => Transaction::class,
+            'ref_type' => $transaction->transaction_type,
             'amount' => $signedAmount,
             'last_amount' => $lastAmount,
             'end_amount' => $endAmount,

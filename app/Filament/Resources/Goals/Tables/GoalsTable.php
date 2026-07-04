@@ -19,15 +19,16 @@ class GoalsTable
     {
         return $table
             ->columns([
-                TextColumn::make('wallet.account_name')
+                TextColumn::make('wallet.bank_name')
                     ->label('Wallet')
+                    ->description(fn ($record) => $record->wallet->account_name)
                     ->searchable(),
                 TextColumn::make('name')
                     ->label('Nama Target')
                     ->searchable(),
                 TextColumn::make('target_amount')
                     ->label('Target Nominal')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('target_date')
                     ->label('Target Tanggal')

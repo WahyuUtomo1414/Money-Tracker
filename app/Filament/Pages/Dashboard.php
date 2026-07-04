@@ -35,16 +35,18 @@ class Dashboard extends BaseDashboard
                                 ->scopeWalletQuery(\App\Models\Wallet::query())
                                 ->get()
                                 ->mapWithKeys(fn ($wallet): array => [
-                                    $wallet->id => "{$wallet->bank_name} - {$wallet->account_name}",
+                                    $wallet->id => $wallet->display_name,
                                 ])
                                 ->all())
                             ->searchable()
                             ->preload()
                             ->placeholder('Semua wallet'),
                         DatePicker::make('start_date')
-                            ->label('Tanggal Mulai'),
+                            ->label('Tanggal Mulai')
+                            ->native(false),
                         DatePicker::make('end_date')
-                            ->label('Tanggal Selesai'),
+                            ->label('Tanggal Selesai')
+                            ->native(false),
                         Select::make('transaction_type')
                             ->label('Tipe Transaksi')
                             ->options(TransactionTypeEnum::options())

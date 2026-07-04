@@ -22,7 +22,7 @@ class GoalForm
                         Select::make('wallet_id')
                             ->label('Wallet')
                             ->relationship('wallet', 'account_name', fn ($query) => app(TransactionScopeService::class)->scopeWalletQuery($query))
-                            ->getOptionLabelFromRecordUsing(fn ($record): string => "{$record->bank_name} - {$record->account_name}")
+                            ->getOptionLabelFromRecordUsing(fn ($record): string => $record->display_name)
                             ->searchable()
                             ->preload()
                             ->required(),
@@ -37,12 +37,14 @@ class GoalForm
                             ->label('Target Nominal')
                             ->prefix('Rp')
                             ->inputMode('numeric')
+                            ->stripCharacters('.')
                             ->formatStateUsing(fn ($state): ?string => filled($state) ? number_format((int) $state, 0, ',', '.') : null)
                             ->afterStateUpdatedJs(<<<'JS'
                                 let value = ($state ?? '').toString().replace(/\D/g, '')
                                 $set('target_amount', value ? new Intl.NumberFormat('id-ID').format(Number(value)) : null)
                             JS)
-                            ->dehydrateStateUsing(fn (?string $state): ?int => filled($state) ? (int) str_replace('.', '', $state) : null)
+                            ->mutateStateForValidationUsing(fn (?string $state): ?int => filled($state) ? (int) preg_replace('/\D/', '', $state) : null)
+                            ->dehydrateStateUsing(fn (?string $state): ?int => filled($state) ? (int) preg_replace('/\D/', '', $state) : null)
                             ->required()
                             ->rule('integer'),
                         DatePicker::make('target_date')

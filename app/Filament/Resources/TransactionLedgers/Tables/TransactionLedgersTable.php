@@ -2,7 +2,8 @@
 
 namespace App\Filament\Resources\TransactionLedgers\Tables;
 
-use App\Models\Transaction;
+use App\Models\Wallet;
+use App\Services\TransactionScopeService;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -22,11 +23,6 @@ class TransactionLedgersTable
                 TextColumn::make('transaction_no')
                     ->label('Nomor Transaksi')
                     ->searchable(),
-                TextColumn::make('reference.transaction_type')
-                    ->label('Tipe Transaksi')
-                    ->badge()
-                    ->formatStateUsing(fn ($state, $record) => $record->reference instanceof Transaction ? ucfirst($record->reference->transaction_type) : '-')
-                    ->toggleable(),
                 TextColumn::make('transaction_date')
                     ->label('Tanggal Transaksi')
                     ->date()
@@ -37,31 +33,37 @@ class TransactionLedgersTable
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('ref_type')
+                    ->label('Tipe Transaksi')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => filled($state) ? ucfirst((string) $state) : '-')
+                    ->toggleable(),
+                TextColumn::make('ref_type')
                     ->label('Ref Type')
                     ->searchable()
-                    ->toggleable(),
-                TextColumn::make('amount')
-                    ->label('Nominal')
-                    ->money('IDR')
-                    ->sortable(),
+                    ->formatStateUsing(fn ($state) => filled($state) ? ucfirst((string) $state) : '-')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('last_amount')
                     ->label('Saldo Sebelumnya')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
                     ->sortable(),
+                TextColumn::make('amount')
+                    ->label('Nominal')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
+                    ->sortable()
+                    ->badge()
+                    ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
                 TextColumn::make('end_amount')
                     ->label('Saldo Akhir')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
                     ->sortable(),
-                TextColumn::make('wallet.account_name')
+                TextColumn::make('wallet.bank_name')
                     ->label('Wallet')
+                    ->description(fn($record) => $record->wallet->account_name)
                     ->searchable(),
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->searchable()
                     ->toggleable(),
-                IconColumn::make('active')
-                    ->label('Aktif')
-                    ->boolean(),
                 TextColumn::make('createdBy.name')
                     ->label('Dibuat Oleh')
                     ->badge()
@@ -84,6 +86,17 @@ class TransactionLedgersTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('wallet_id')
+                    ->label('Wallet')
+                    ->options(fn (): array => app(TransactionScopeService::class)
+                        ->scopeWalletQuery(Wallet::query())
+                        ->get()
+                        ->mapWithKeys(fn (Wallet $wallet): array => [
+                            $wallet->id => $wallet->display_name,
+                        ])
+                        ->all())
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('updated_by')
                     ->label('Diubah Oleh')
                     ->relationship('updatedBy', 'name')

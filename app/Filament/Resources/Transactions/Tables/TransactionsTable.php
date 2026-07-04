@@ -37,7 +37,7 @@ class TransactionsTable
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label('Nominal')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
                     ->sortable(),
                 ImageColumn::make('image')
                     ->label('Bukti'),
