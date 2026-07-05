@@ -5,12 +5,16 @@ namespace App\Filament\Resources\Wallets;
 use App\Filament\Resources\Wallets\Pages\CreateWallet;
 use App\Filament\Resources\Wallets\Pages\EditWallet;
 use App\Filament\Resources\Wallets\Pages\ListWallets;
+use App\Filament\Resources\Wallets\Pages\ViewWallet;
 use App\Filament\Resources\Wallets\RelationManagers\UsersRelationManager;
 use App\Filament\Resources\Wallets\Schemas\WalletForm;
 use App\Filament\Resources\Wallets\Tables\WalletsTable;
 use App\Models\Wallet;
 use BackedEnum;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -44,6 +48,38 @@ class WalletResource extends Resource
         return WalletsTable::configure($table);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Detail Wallet')
+                    ->schema([
+                        TextEntry::make('display_name')
+                            ->label('Wallet'),
+                        TextEntry::make('category.name')
+                            ->label('Kategori'),
+                        TextEntry::make('account_no')
+                            ->label('Nomor Rekening'),
+                        IconEntry::make('active')
+                            ->label('Aktif')
+                            ->boolean(),
+                        TextEntry::make('description')
+                            ->label('Deskripsi')
+                            ->columnSpanFull()
+                            ->default('-'),
+                        TextEntry::make('createdBy.name')
+                            ->label('Dibuat Oleh')
+                            ->badge()
+                            ->default('-'),
+                        TextEntry::make('created_at')
+                            ->label('Dibuat Pada')
+                            ->dateTime(),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -64,6 +100,7 @@ class WalletResource extends Resource
         return [
             'index' => ListWallets::route('/'),
             'create' => CreateWallet::route('/create'),
+            'view' => ViewWallet::route('/{record}'),
             'edit' => EditWallet::route('/{record}/edit'),
         ];
     }

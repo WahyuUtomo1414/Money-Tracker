@@ -50,11 +50,7 @@ class TransactionForm
                                     return 'Pilih wallet untuk melihat saldo saat ini.';
                                 }
 
-                                $balance = TransactionLedger::query()
-                                    ->where('wallet_id', $walletId)
-                                    ->latest('transaction_date')
-                                    ->latest('id')
-                                    ->value('end_amount') ?? 0;
+                                $balance = static::getWalletBalance($walletId);
 
                                 return 'Saldo wallet saat ini: Rp ' . number_format((float) $balance, 0, ',', '.');
                             })
@@ -75,7 +71,26 @@ class TransactionForm
                             ->mutateStateForValidationUsing(fn (?string $state): ?int => filled($state) ? (int) preg_replace('/\D/', '', $state) : null)
                             ->dehydrateStateUsing(fn (?string $state): ?int => filled($state) ? (int) preg_replace('/\D/', '', $state) : null)
                             ->required()
-                            ->rule('integer'),
+                            ->rule('integer')
+                            ->rule(function (Get $get): \Closure {
+                                return function (string $attribute, $value, \Closure $fail) use ($get): void {
+                                    if ($get('transaction_type') !== TransactionTypeEnum::Payment->value) {
+                                        return;
+                                    }
+
+                                    $walletId = $get('wallet_id');
+
+                                    if (! filled($walletId) || ! filled($value)) {
+                                        return;
+                                    }
+
+                                    $balance = static::getWalletBalance($walletId);
+
+                                    if ((int) $value > $balance) {
+                                        $fail('Nominal payment tidak boleh melebihi saldo wallet yang dipilih.');
+                                    }
+                                };
+                            }),
                         Select::make('category_id')
                             ->label('Kategori')
                             ->relationship('category', 'name', fn ($query) => $query->where('type', 'transaction'))
@@ -100,5 +115,18 @@ class TransactionForm
                     ->columns(2)
                     ->columnSpanFull(),
             ]);
+    }
+
+    protected static function getWalletBalance(int | string | null $walletId): float
+    {
+        if (! filled($walletId)) {
+            return 0;
+        }
+
+        return (float) (TransactionLedger::query()
+            ->where('wallet_id', $walletId)
+            ->latest('transaction_date')
+            ->latest('id')
+            ->value('end_amount') ?? 0);
     }
 }

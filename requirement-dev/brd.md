@@ -169,14 +169,17 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - Sistem memvalidasi `transaction_type` berdasarkan enum.
 - Sistem menyimpan `wallet_id` sebagai referensi utama.
 - `category_id` bersifat opsional.
-- `goals_id` bersifat opsional.
+- `goal_id` bersifat opsional.
 - Gambar bukti transaksi dapat disimpan pada kolom `image`.
 
 ### 6.7 Ledger
 
 - Saat transaksi dibuat, sistem membuat baris ledger.
+- Setiap baris ledger harus menyimpan `ref_id` yang mengarah ke `transaction.id`.
 - Ledger menyimpan saldo sebelum dan sesudah transaksi.
 - Ledger dapat ditelusuri berdasarkan wallet dan nomor transaksi.
+- Saat transaksi diubah, sistem memperbarui ledger transaksi tersebut lalu menghitung ulang saldo transaksi setelahnya pada wallet terkait.
+- Saat transaksi dihapus, sistem menghapus ledger berdasarkan `ref_id` lalu menghitung ulang saldo transaksi setelahnya pada wallet terkait.
 
 ## 7. Kebutuhan Non-Fungsional
 
@@ -195,6 +198,7 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - Goal boleh kosong pada transaksi umum.
 - Category boleh kosong pada transaksi yang belum perlu klasifikasi detail.
 - Ledger hanya boleh dibuat oleh proses sistem, bukan input manual user.
+- Hubungan transaksi ke ledger menggunakan `transaction.id -> transaction_ledger.ref_id`.
 
 ## 9. Asumsi Awal
 
@@ -207,4 +211,4 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 
 - Tabel `category` saat ini dipakai untuk lebih dari satu konteks, sehingga perlu aturan `type` yang jelas.
 - Tabel `transaction_ledger` membutuhkan logika saldo yang konsisten agar tidak terjadi mismatch.
-- Penamaan kolom `goals_id` pada ERD sebaiknya dipertimbangkan ulang menjadi `goal_id` agar konsisten dengan konvensi Laravel.
+- Perubahan transaksi lama dapat memengaruhi saldo semua transaksi setelahnya pada wallet yang sama, sehingga recalculation ledger wajib konsisten.

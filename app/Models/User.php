@@ -43,4 +43,14 @@ class User extends Authenticatable
             ->using(UserWallet::class)
             ->withTimestamps();
     }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasAnyRole(['super admin', 'super-admin']);
+    }
+
+    public function isPengguna(): bool
+    {
+        return $this->hasRole('pengguna');
+    }
 }

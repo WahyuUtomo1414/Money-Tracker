@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Auth\Register;
 use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -30,6 +31,7 @@ class MoneyTrackerPanelProvider extends PanelProvider
             ->path('money-tracker')
             ->brandName('Money Tracker')
             ->login()
+            ->registration(Register::class)
             ->colors([
                 'primary' => \Filament\Support\Colors\Color::hex('#112E81'),
             ])

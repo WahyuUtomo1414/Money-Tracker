@@ -6,6 +6,7 @@ use App\Enums\TransactionTypeEnum;
 use App\Filament\Widgets\DashboardLineChartWidget;
 use App\Filament\Widgets\DashboardPieChartWidget;
 use App\Filament\Widgets\DashboardStatsOverviewWidget;
+use App\Filament\Widgets\DashboardGoalsWidget;
 use App\Services\TransactionScopeService;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -62,6 +63,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             DashboardStatsOverviewWidget::class,
+            //DashboardGoalsWidget::class,
             DashboardLineChartWidget::class,
             DashboardPieChartWidget::class,
         ];

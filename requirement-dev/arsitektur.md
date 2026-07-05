@@ -129,14 +129,18 @@ Tanggung jawab:
 
 - Membuat transaksi.
 - Menghitung efek saldo berdasarkan tipe transaksi.
-- Membuat ledger secara atomik dalam database transaction.
+- Membuat atau memperbarui ledger secara atomik dalam database transaction.
+- Menyimpan hubungan `transaction.id -> transaction_ledger.ref_id`.
+- Menghitung ulang saldo ledger setelah titik transaksi yang berubah.
 
-#### WalletBalanceService
+#### TransactionLedgerService
 
 Tanggung jawab:
 
-- Mengambil saldo terakhir wallet.
-- Menentukan `last_amount` sebelum ledger baru dibuat.
+- `create`: membuat row ledger untuk transaksi lalu menghitung ulang saldo dari transaksi tersebut ke bawah.
+- `update`: mencari ledger berdasarkan `ref_id`, mengganti data ledger transaksi tersebut, lalu menghitung ulang saldo transaksi setelahnya.
+- `delete`: menghapus ledger berdasarkan `ref_id`, lalu menghitung ulang saldo transaksi setelahnya.
+- Recalculation dibatasi pada wallet terkait agar tidak memindai semua transaksi lintas wallet.
 
 ## 5. Rekomendasi Struktur Filament
 
@@ -172,8 +176,8 @@ Filament Form
 -> panggil TransactionPostingService
 -> generate transaction_no via TransactionNumberService
 -> simpan transaction
--> hitung saldo sebelum dan sesudah
--> simpan transaction_ledger
+-> simpan transaction_ledger dengan ref_id = transaction.id
+-> hitung ulang last_amount dan end_amount mulai dari transaksi tersebut
 -> commit database transaction
 ```
 
