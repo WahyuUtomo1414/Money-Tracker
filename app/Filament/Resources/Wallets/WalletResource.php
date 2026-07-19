@@ -9,7 +9,9 @@ use App\Filament\Resources\Wallets\Pages\ViewWallet;
 use App\Filament\Resources\Wallets\RelationManagers\UsersRelationManager;
 use App\Filament\Resources\Wallets\Schemas\WalletForm;
 use App\Filament\Resources\Wallets\Tables\WalletsTable;
+use App\Models\User;
 use App\Models\Wallet;
+use App\Services\TransactionScopeService;
 use BackedEnum;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -19,6 +21,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
@@ -89,10 +92,12 @@ class WalletResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return app(TransactionScopeService::class)->scopeWalletQuery(
+            parent::getEloquentQuery()
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]),
+        );
     }
 
     public static function getPages(): array
@@ -107,9 +112,39 @@ class WalletResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return parent::getRecordRouteBindingEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+        return app(TransactionScopeService::class)->scopeWalletQuery(
+            parent::getRecordRouteBindingEloquentQuery()
+                ->withoutGlobalScopes([
+                    SoftDeletingScope::class,
+                ]),
+        );
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::isSuperAdmin() || ((int) $record->created_by === (int) auth()->id());
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canEdit($record);
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return static::canEdit($record);
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return static::canEdit($record);
+    }
+
+    protected static function isSuperAdmin(): bool
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return $user?->isSuperAdmin() ?? false;
     }
 }

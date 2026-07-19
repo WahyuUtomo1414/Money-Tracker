@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\UserWallet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -24,44 +25,76 @@ class TransactionScopeService
 
     public function scopeTransactionQuery(Builder $query): Builder
     {
-        return $this->scopeByWalletColumn($query, $query->qualifyColumn('wallet_id'));
+        return $this->scopeByOwnerOrWalletColumn($query, $query->qualifyColumn('wallet_id'));
     }
 
     public function scopeTransactionLedgerQuery(Builder $query): Builder
     {
-        return $this->scopeByWalletColumn($query, $query->qualifyColumn('wallet_id'));
+        return $this->scopeByOwnerOrWalletColumn($query, $query->qualifyColumn('wallet_id'));
     }
 
     public function scopeWalletQuery(Builder $query): Builder
     {
+        if ($this->canSeeAllData()) {
+            return $query;
+        }
+
+        $userId = Auth::id();
         $walletIds = $this->allowedWalletIds()->all();
 
-        if (empty($walletIds)) {
+        if (! $userId && empty($walletIds)) {
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->whereIn($query->qualifyColumn('id'), $walletIds);
+        return $query->where(function (Builder $query) use ($userId, $walletIds): void {
+            if ($userId) {
+                $query->where($query->qualifyColumn('created_by'), $userId);
+            }
+
+            if (! empty($walletIds)) {
+                $query->orWhereIn($query->qualifyColumn('id'), $walletIds);
+            }
+        });
     }
 
     public function scopeGoalQuery(Builder $query): Builder
     {
-        $walletIds = $this->allowedWalletIds()->all();
-
-        if (empty($walletIds)) {
-            return $query->whereRaw('1 = 0');
+        if ($this->canSeeAllData()) {
+            return $query;
         }
 
-        return $query->whereIn($query->qualifyColumn('wallet_id'), $walletIds);
+        return $this->scopeByOwnerOrWalletColumn($query, $query->qualifyColumn('wallet_id'));
     }
 
-    protected function scopeByWalletColumn(Builder $query, string $walletColumn): Builder
+    protected function scopeByOwnerOrWalletColumn(Builder $query, string $walletColumn): Builder
     {
+        if ($this->canSeeAllData()) {
+            return $query;
+        }
+
+        $userId = Auth::id();
         $walletIds = $this->allowedWalletIds()->all();
 
-        if (empty($walletIds)) {
+        if (! $userId && empty($walletIds)) {
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->whereIn($walletColumn, $walletIds);
+        return $query->where(function (Builder $query) use ($userId, $walletIds, $walletColumn): void {
+            if ($userId) {
+                $query->where($query->qualifyColumn('created_by'), $userId);
+            }
+
+            if (! empty($walletIds)) {
+                $query->orWhereIn($walletColumn, $walletIds);
+            }
+        });
+    }
+
+    protected function canSeeAllData(): bool
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user?->isSuperAdmin() ?? false;
     }
 }

@@ -14,16 +14,20 @@ class TransactionReceiptService
 
     public function sendCreatedReceipt(Transaction $transaction): void
     {
-        $transaction->loadMissing(['wallet', 'category', 'goal', 'createdBy']);
+        $transaction->loadMissing(['wallet.users', 'category', 'goal', 'createdBy']);
 
-        $recipient = $transaction->createdBy?->email;
+        $recipients = $transaction->wallet?->users?->pluck('email')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all() ?? [];
 
-        if (! filled($recipient)) {
+        if (empty($recipients)) {
             return;
         }
 
         $pdf = $this->transactionPdfService->generate($transaction);
 
-        Mail::to($recipient)->send(new TransactionCreatedMail($transaction, $pdf));
+        Mail::to($recipients)->send(new TransactionCreatedMail($transaction, $pdf));
     }
 }

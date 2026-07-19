@@ -95,18 +95,12 @@ class GoalResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $query = app(TransactionScopeService::class)->scopeGoalQuery(
+        return app(TransactionScopeService::class)->scopeGoalQuery(
             parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]),
         );
-
-        if (! static::isSuperAdmin()) {
-            $query->where('created_by', auth()->id());
-        }
-
-        return $query;
     }
 
     public static function getPages(): array
@@ -121,18 +115,12 @@ class GoalResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        $query = app(TransactionScopeService::class)->scopeGoalQuery(
+        return app(TransactionScopeService::class)->scopeGoalQuery(
             parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]),
         );
-
-        if (! static::isSuperAdmin()) {
-            $query->where('created_by', auth()->id());
-        }
-
-        return $query;
     }
 
     public static function canEdit(Model $record): bool
