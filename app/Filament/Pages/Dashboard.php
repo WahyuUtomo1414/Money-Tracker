@@ -48,7 +48,7 @@ class Dashboard extends BaseDashboard
                         DatePicker::make('end_date')
                             ->label('Tanggal Selesai')
                             ->native(false),
-                        Select::make('ref_type')
+                        Select::make('transaction_type')
                             ->label('Tipe Transaksi')
                             ->options(TransactionTypeEnum::options())
                             ->searchable()

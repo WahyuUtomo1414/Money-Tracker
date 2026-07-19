@@ -36,12 +36,12 @@ class TransactionLedgersTable
                 TextColumn::make('ref_type')
                     ->label('Tipe Transaksi')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state) => filled($state) ? TransactionTypeEnum::from($state)->label() : '-')
+                    ->formatStateUsing(fn (?string $state): string => self::formatRefType($state))
                     ->toggleable(),
                 TextColumn::make('ref_type')
                     ->label('Jenis Referensi')
                     ->searchable()
-                    ->formatStateUsing(fn (?string $state) => filled($state) ? TransactionTypeEnum::from($state)->label() : '-')
+                    ->formatStateUsing(fn (?string $state): string => self::formatRefType($state))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('last_amount')
                     ->label('Saldo Sebelumnya')
@@ -112,5 +112,16 @@ class TransactionLedgersTable
             ])
             ->recordActions([])
             ->toolbarActions([]);
+    }
+
+    protected static function formatRefType(?string $state): string
+    {
+        if (! filled($state)) {
+            return '-';
+        }
+
+        $transactionType = TransactionTypeEnum::tryFrom($state);
+
+        return $transactionType?->label() ?? 'Transaksi';
     }
 }

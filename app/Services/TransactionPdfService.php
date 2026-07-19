@@ -4,10 +4,9 @@ namespace App\Services;
 
 use App\Enums\TransactionTypeEnum;
 use App\Models\Transaction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use RuntimeException;
-use Symfony\Component\Process\Process;
 
 class TransactionPdfService
 {
@@ -22,69 +21,19 @@ class TransactionPdfService
         File::ensureDirectoryExists($directory);
 
         $filename = Str::slug((string) $transaction->transaction_no) . '.pdf';
-        $payloadPath = $directory . DIRECTORY_SEPARATOR . Str::slug((string) $transaction->transaction_no) . '.json';
         $outputPath = $directory . DIRECTORY_SEPARATOR . $filename;
 
-        File::put($payloadPath, json_encode($this->buildPayload($transaction), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-
-        $process = new Process([
-            $this->resolvePythonBinary(),
-            base_path('bin/generate_transaction_pdf.py'),
-            $payloadPath,
-            $outputPath,
-        ]);
-
-        $process->setTimeout((int) config('services.transaction_pdf.timeout', 30));
-        $process->run();
-
-        File::delete($payloadPath);
-
-        if (! $process->isSuccessful()) {
-            throw new RuntimeException(trim($process->getErrorOutput() ?: $process->getOutput() ?: 'Generator PDF transaksi gagal dijalankan.'));
-        }
-
-        if (! File::exists($outputPath)) {
-            throw new RuntimeException('File PDF transaksi tidak berhasil dibuat.');
-        }
+        Pdf::loadView('pdf.transactions.receipt', [
+            'transaction' => $transaction,
+            'receipt' => $this->buildPayload($transaction),
+        ])
+            ->setPaper('a4')
+            ->save($outputPath);
 
         return [
             'path' => $outputPath,
             'filename' => $filename,
         ];
-    }
-
-    protected function resolvePythonBinary(): string
-    {
-        $candidates = array_filter([
-            config('services.transaction_pdf.python_binary'),
-            env('HOME') ? env('HOME') . '/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3' : null,
-            '/usr/bin/python3',
-            '/opt/homebrew/bin/python3',
-            'python3',
-            'python',
-        ]);
-
-        foreach ($candidates as $candidate) {
-            if (is_string($candidate) && $this->canRunReportLab($candidate)) {
-                return $candidate;
-            }
-        }
-
-        throw new RuntimeException('Binary Python untuk generator PDF transaksi tidak ditemukan.');
-    }
-
-    protected function canRunReportLab(string $pythonBinary): bool
-    {
-        $process = new Process([
-            $pythonBinary,
-            '-c',
-            'import reportlab',
-        ]);
-
-        $process->setTimeout(10);
-        $process->run();
-
-        return $process->isSuccessful();
     }
 
     /**

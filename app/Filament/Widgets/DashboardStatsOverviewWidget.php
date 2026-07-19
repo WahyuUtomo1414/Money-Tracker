@@ -89,7 +89,7 @@ class DashboardStatsOverviewWidget extends StatsOverviewWidget
         }
 
         if (filled($this->pageFilters['transaction_type'] ?? null)) {
-            $query->where('transaction_type', $this->pageFilters['transaction_type']);
+            $query->where('ref_type', $this->pageFilters['transaction_type']);
         }
 
         if (filled($this->pageFilters['start_date'] ?? null)) {
