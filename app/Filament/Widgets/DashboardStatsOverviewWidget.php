@@ -35,22 +35,22 @@ class DashboardStatsOverviewWidget extends StatsOverviewWidget
 
         return [
             Stat::make('Total Transaksi', number_format($totalTransactions))
-                ->description('Total Transaksi')
+                ->description('Frekuensi aktivitas transaksi keuangan')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->chart([4, 6, 5, 8, 7, 10, 12])
                 ->color('primary'),
             Stat::make('Total Pemasukan', 'Rp ' . number_format((float) $totalIncome, 0, ',', '.'))
-                ->description('Total Top Up, Penyesuaian, dan Pengembalian Dana')
+                ->description('Akumulasi dana masuk (Top Up, Refund, Penyesuaian)')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->chart([3, 5, 4, 9, 8, 11, 14])
                 ->color('success'),
             Stat::make('Total Pengeluaran', 'Rp ' . number_format((float) $totalExpense, 0, ',', '.'))
-                ->description('Total Pembayaran')
+                ->description('Akumulasi dana keluar (Pembayaran transaksi)')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->chart([12, 10, 11, 8, 9, 6, 5])
                 ->color('danger'),
             Stat::make('Saldo Terakhir', 'Rp ' . number_format((float) $latestBalance, 0, ',', '.'))
-                ->description('Saldo Akhir')
+                ->description('Estimasi saldo berjalan saat ini')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->chart([2, 4, 6, 5, 9, 11, 13])
                 ->color('info'),

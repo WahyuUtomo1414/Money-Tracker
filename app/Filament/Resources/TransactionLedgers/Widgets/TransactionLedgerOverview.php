@@ -20,14 +20,14 @@ class TransactionLedgerOverview extends StatsOverviewWidget
             ->first();
 
         return [
-            Stat::make('Total Ledger', number_format((clone $scopedLedgerQuery)->count()))
-                ->description('Jumlah histori ledger')
+            Stat::make('Total Riwayat Mutasi', number_format((clone $scopedLedgerQuery)->count()))
+                ->description('Jumlah catatan perubahan saldo')
                 ->color('primary'),
-            Stat::make('Total Perubahan', 'Rp ' . number_format((float) (clone $scopedLedgerQuery)->sum('amount'), 0, ',', '.'))
-                ->description('Akumulasi nominal perubahan')
+            Stat::make('Akumulasi Perubahan', 'Rp ' . number_format((float) (clone $scopedLedgerQuery)->sum('amount'), 0, ',', '.'))
+                ->description('Total kumulatif nominal pergeseran dana')
                 ->color('success'),
-            Stat::make('Saldo Akhir Terbaru', 'Rp ' . number_format((float) ($latestLedger?->end_amount ?? 0), 0, ',', '.'))
-                ->description('Diambil dari ledger terbaru')
+            Stat::make('Saldo Akhir Terkini', 'Rp ' . number_format((float) ($latestLedger?->end_amount ?? 0), 0, ',', '.'))
+                ->description('Saldo berjalan dari pencatatan terbaru')
                 ->color('warning'),
         ];
     }
