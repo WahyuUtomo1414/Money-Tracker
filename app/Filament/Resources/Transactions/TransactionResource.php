@@ -13,8 +13,8 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Services\TransactionScopeService;
 use BackedEnum;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -77,15 +77,20 @@ class TransactionResource extends Resource
                         TextEntry::make('goal.name')
                             ->label('Target Tabungan')
                             ->default('-'),
-                        ImageEntry::make('image')
+                        ViewEntry::make('image')
                             ->label('Bukti Gambar')
-                            ->disk('public')
-                            ->visibility('public')
+                            ->view('filament.transactions.proof-image-entry')
+                            ->columnSpanFull()
                             ->hidden(fn ($record) => blank($record->image)),
                         TextEntry::make('description')
                             ->label('Deskripsi')
                             ->columnSpanFull()
                             ->default('-'),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
+                Section::make('Audit Transaksi')
+                    ->schema([
                         TextEntry::make('createdBy.name')
                             ->label('Dibuat Oleh')
                             ->badge()
@@ -93,6 +98,22 @@ class TransactionResource extends Resource
                         TextEntry::make('created_at')
                             ->label('Dibuat Pada')
                             ->dateTime(),
+                        TextEntry::make('updatedBy.name')
+                            ->label('Diubah Oleh')
+                            ->badge()
+                            ->default('-'),
+                        TextEntry::make('updated_at')
+                            ->label('Diubah Pada')
+                            ->dateTime(),
+                        TextEntry::make('deletedBy.name')
+                            ->label('Dihapus Oleh')
+                            ->badge()
+                            ->default('-')
+                            ->visible(fn (Transaction $record): bool => filled($record->deleted_at)),
+                        TextEntry::make('deleted_at')
+                            ->label('Dihapus Pada')
+                            ->dateTime()
+                            ->visible(fn (Transaction $record): bool => filled($record->deleted_at)),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

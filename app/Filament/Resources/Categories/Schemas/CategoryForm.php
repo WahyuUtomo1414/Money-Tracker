@@ -24,8 +24,8 @@ class CategoryForm
                         Select::make('type')
                             ->label('Tipe')
                             ->options([
-                                'transaction' => 'Transaction',
-                                'wallet' => 'Wallet',
+                                'transaction' => 'Transaksi',
+                                'wallet' => 'Rekening',
                             ])
                             ->required(),
                         Textarea::make('description')
