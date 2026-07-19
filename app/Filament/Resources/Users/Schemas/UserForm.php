@@ -36,7 +36,7 @@ class UserForm
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->dehydrated(fn (?string $state): bool => filled($state)),
                         Select::make('roles')
-                            ->label('Role')
+                            ->label('Peran')
                             ->relationship('roles', 'name')
                             ->multiple()
                             ->searchable()

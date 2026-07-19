@@ -22,11 +22,11 @@ class TransactionLedgerResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Transaksi';
 
-    protected static ?string $navigationLabel = 'Ledger Transaksi';
+    protected static ?string $navigationLabel = 'Riwayat Transaksi';
 
-    protected static ?string $modelLabel = 'Ledger Transaksi';
+    protected static ?string $modelLabel = 'Riwayat Transaksi';
 
-    protected static ?string $pluralModelLabel = 'Ledger Transaksi';
+    protected static ?string $pluralModelLabel = 'Riwayat Transaksi';
 
     protected static ?string $recordTitleAttribute = 'transaction_no';
 

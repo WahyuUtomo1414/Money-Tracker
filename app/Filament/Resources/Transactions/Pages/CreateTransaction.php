@@ -6,6 +6,8 @@ use App\Enums\TransactionTypeEnum;
 use App\Filament\Resources\Transactions\TransactionResource;
 use App\Helpers\TransactionNoHelper;
 use App\Services\TransactionLedgerService;
+use App\Services\TransactionReceiptService;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateTransaction extends CreateRecord
@@ -24,5 +26,17 @@ class CreateTransaction extends CreateRecord
     protected function afterCreate(): void
     {
         app(TransactionLedgerService::class)->create($this->record);
+
+        try {
+            app(TransactionReceiptService::class)->sendCreatedReceipt($this->record);
+        } catch (\Throwable $throwable) {
+            report($throwable);
+
+            Notification::make()
+                ->warning()
+                ->title('Transaksi berhasil disimpan')
+                ->body('Email bukti transaksi belum berhasil dikirim. Silakan cek konfigurasi email atau generator PDF.')
+                ->send();
+        }
     }
 }

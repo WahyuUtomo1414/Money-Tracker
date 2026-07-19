@@ -28,7 +28,7 @@ class UsersTable
                     ->label('Email')
                     ->searchable(),
                 TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label('Peran')
                     ->badge()
                     ->separator(', '),
                 TextColumn::make('email_verified_at')

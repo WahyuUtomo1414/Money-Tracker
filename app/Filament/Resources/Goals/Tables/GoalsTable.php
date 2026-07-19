@@ -21,7 +21,7 @@ class GoalsTable
         return $table
             ->columns([
                 TextColumn::make('wallet.bank_name')
-                    ->label('Wallet')
+                    ->label('Rekening')
                     ->description(fn ($record) => $record->wallet->account_name)
                     ->searchable(),
                 TextColumn::make('name')

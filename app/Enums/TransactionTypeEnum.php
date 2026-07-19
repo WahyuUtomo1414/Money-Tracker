@@ -12,10 +12,10 @@ enum TransactionTypeEnum: string
     public function label(): string
     {
         return match ($this) {
-            self::Topup => 'Topup',
-            self::Payment => 'Payment',
-            self::Refund => 'Refund',
-            self::Adjustment => 'Adjustment',
+            self::Topup => 'Top Up',
+            self::Payment => 'Pembayaran',
+            self::Refund => 'Pengembalian Dana',
+            self::Adjustment => 'Penyesuaian',
         };
     }
 

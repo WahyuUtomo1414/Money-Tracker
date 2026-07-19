@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Transactions\Tables;
 
+use App\Enums\TransactionTypeEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -31,6 +33,7 @@ class TransactionsTable
                 TextColumn::make('transaction_type')
                     ->label('Tipe Transaksi')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => filled($state) ? TransactionTypeEnum::from($state)->label() : '-')
                     ->searchable(),
                 TextColumn::make('transaction_date')
                     ->label('Tanggal Transaksi')
@@ -43,7 +46,7 @@ class TransactionsTable
                 ImageColumn::make('image')
                     ->label('Bukti'),
                 TextColumn::make('wallet.account_name')
-                    ->label('Wallet')
+                    ->label('Rekening')
                     ->searchable(),
                 TextColumn::make('category.name')
                     ->label('Kategori')
@@ -81,10 +84,10 @@ class TransactionsTable
                 SelectFilter::make('transaction_type')
                     ->label('Tipe Transaksi')
                     ->options([
-                        'topup' => 'Topup',
-                        'payment' => 'Payment',
-                        'refund' => 'Refund',
-                        'adjustment' => 'Adjustment',
+                        'topup' => 'Top Up',
+                        'payment' => 'Pembayaran',
+                        'refund' => 'Pengembalian Dana',
+                        'adjustment' => 'Penyesuaian',
                     ]),
                 SelectFilter::make('updated_by')
                     ->label('Diubah Oleh')
@@ -99,6 +102,11 @@ class TransactionsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Action::make('pdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->url(fn ($record): string => route('transactions.pdf.show', $record))
+                    ->openUrlInNewTab(),
                 ViewAction::make(),
                 EditAction::make(),
             ])

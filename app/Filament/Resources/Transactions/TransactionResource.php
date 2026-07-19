@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Transactions;
 
+use App\Enums\TransactionTypeEnum;
 use App\Filament\Resources\Transactions\Pages\CreateTransaction;
 use App\Filament\Resources\Transactions\Pages\EditTransaction;
 use App\Filament\Resources\Transactions\Pages\ListTransactions;
@@ -61,12 +62,12 @@ class TransactionResource extends Resource
                         TextEntry::make('transaction_type')
                             ->label('Tipe Transaksi')
                             ->badge()
-                            ->formatStateUsing(fn ($state) => filled($state) ? ucfirst((string) $state) : '-'),
+                            ->formatStateUsing(fn (?string $state) => filled($state) ? TransactionTypeEnum::from($state)->label() : '-'),
                         TextEntry::make('transaction_date')
                             ->label('Tanggal Transaksi')
                             ->date(),
                         TextEntry::make('wallet.display_name')
-                            ->label('Wallet'),
+                            ->label('Rekening'),
                         TextEntry::make('amount')
                             ->label('Nominal')
                             ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.')),

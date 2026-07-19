@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'transaction_pdf' => [
+        'python_binary' => env('TRANSACTION_PDF_PYTHON_BIN'),
+        'timeout' => env('TRANSACTION_PDF_TIMEOUT', 30),
+    ],
+
 ];

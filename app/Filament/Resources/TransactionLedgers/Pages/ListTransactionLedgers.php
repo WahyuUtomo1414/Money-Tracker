@@ -30,16 +30,16 @@ class ListTransactionLedgers extends ListRecords
     {
         return [
             'all' => Tab::make('Semua'),
-            'topup' => Tab::make('Topup')
+            'topup' => Tab::make('Top Up')
                 ->badge((string) $this->countByTransactionType('topup'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('ref_type', 'topup')),
-            'payment' => Tab::make('Payment')
+            'payment' => Tab::make('Pembayaran')
                 ->badge((string) $this->countByTransactionType('payment'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('ref_type', 'payment')),
-            'refund' => Tab::make('Refund')
+            'refund' => Tab::make('Pengembalian Dana')
                 ->badge((string) $this->countByTransactionType('refund'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('ref_type', 'refund')),
-            'adjustment' => Tab::make('Adjustment')
+            'adjustment' => Tab::make('Penyesuaian')
                 ->badge((string) $this->countByTransactionType('adjustment'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('ref_type', 'adjustment')),
         ];

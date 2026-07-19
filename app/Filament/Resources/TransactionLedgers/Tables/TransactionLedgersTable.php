@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TransactionLedgers\Tables;
 
+use App\Enums\TransactionTypeEnum;
 use App\Models\Wallet;
 use App\Services\TransactionScopeService;
 use Filament\Tables\Columns\IconColumn;
@@ -35,12 +36,12 @@ class TransactionLedgersTable
                 TextColumn::make('ref_type')
                     ->label('Tipe Transaksi')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => filled($state) ? ucfirst((string) $state) : '-')
+                    ->formatStateUsing(fn (?string $state) => filled($state) ? TransactionTypeEnum::from($state)->label() : '-')
                     ->toggleable(),
                 TextColumn::make('ref_type')
-                    ->label('Ref Type')
+                    ->label('Jenis Referensi')
                     ->searchable()
-                    ->formatStateUsing(fn ($state) => filled($state) ? ucfirst((string) $state) : '-')
+                    ->formatStateUsing(fn (?string $state) => filled($state) ? TransactionTypeEnum::from($state)->label() : '-')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('last_amount')
                     ->label('Saldo Sebelumnya')
@@ -57,8 +58,8 @@ class TransactionLedgersTable
                     ->formatStateUsing(fn ($state) => 'Rp ' . number_format((float) $state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('wallet.bank_name')
-                    ->label('Wallet')
-                    ->description(fn($record) => $record->wallet->account_name)
+                    ->label('Rekening')
+                    ->description(fn ($record) => $record->wallet->account_name)
                     ->searchable(),
                 TextColumn::make('category.name')
                     ->label('Kategori')
@@ -87,7 +88,7 @@ class TransactionLedgersTable
             ])
             ->filters([
                 SelectFilter::make('wallet_id')
-                    ->label('Wallet')
+                    ->label('Rekening')
                     ->options(fn (): array => app(TransactionScopeService::class)
                         ->scopeWalletQuery(Wallet::query())
                         ->get()

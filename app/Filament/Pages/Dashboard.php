@@ -31,7 +31,7 @@ class Dashboard extends BaseDashboard
                 Section::make('Filter Dashboard')
                     ->schema([
                         Select::make('wallet_id')
-                            ->label('Wallet')
+                            ->label('Rekening')
                             ->options(fn (): array => app(TransactionScopeService::class)
                                 ->scopeWalletQuery(\App\Models\Wallet::query())
                                 ->get()
@@ -41,14 +41,14 @@ class Dashboard extends BaseDashboard
                                 ->all())
                             ->searchable()
                             ->preload()
-                            ->placeholder('Semua wallet'),
+                            ->placeholder('Semua rekening'),
                         DatePicker::make('start_date')
                             ->label('Tanggal Mulai')
                             ->native(false),
                         DatePicker::make('end_date')
                             ->label('Tanggal Selesai')
                             ->native(false),
-                        Select::make('transaction_type')
+                        Select::make('ref_type')
                             ->label('Tipe Transaksi')
                             ->options(TransactionTypeEnum::options())
                             ->searchable()

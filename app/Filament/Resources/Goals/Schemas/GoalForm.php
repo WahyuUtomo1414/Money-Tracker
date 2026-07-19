@@ -20,7 +20,7 @@ class GoalForm
                 Section::make('Informasi Target Tabungan')
                     ->schema([
                         Select::make('wallet_id')
-                            ->label('Wallet')
+                            ->label('Rekening')
                             ->relationship('wallet', 'account_name', fn ($query) => app(TransactionScopeService::class)->scopeWalletQuery($query))
                             ->getOptionLabelFromRecordUsing(fn ($record): string => $record->display_name)
                             ->searchable()

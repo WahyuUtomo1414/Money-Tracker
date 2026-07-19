@@ -59,10 +59,10 @@ class UserResource extends Resource
                         TextEntry::make('email')
                             ->label('Email'),
                         TextEntry::make('roles.name')
-                            ->label('Role')
+                            ->label('Peran')
                             ->badge(),
                         TextEntry::make('wallets_count')
-                            ->label('Total Wallet')
+                            ->label('Total Rekening')
                             ->counts('wallets'),
                         ImageEntry::make('avatar')
                             ->label('Avatar')

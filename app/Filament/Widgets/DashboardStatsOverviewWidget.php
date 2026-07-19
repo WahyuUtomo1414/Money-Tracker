@@ -40,12 +40,12 @@ class DashboardStatsOverviewWidget extends StatsOverviewWidget
                 ->chart([4, 6, 5, 8, 7, 10, 12])
                 ->color('primary'),
             Stat::make('Total Pemasukan', 'Rp ' . number_format((float) $totalIncome, 0, ',', '.'))
-                ->description('Total Topup, Adjustment, dan Refund')
+                ->description('Total Top Up, Penyesuaian, dan Pengembalian Dana')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->chart([3, 5, 4, 9, 8, 11, 14])
                 ->color('success'),
             Stat::make('Total Pengeluaran', 'Rp ' . number_format((float) $totalExpense, 0, ',', '.'))
-                ->description('Total Payment')
+                ->description('Total Pembayaran')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->chart([12, 10, 11, 8, 9, 6, 5])
                 ->color('danger'),

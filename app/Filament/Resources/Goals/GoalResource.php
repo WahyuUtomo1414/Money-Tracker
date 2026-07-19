@@ -57,7 +57,7 @@ class GoalResource extends Resource
                 Section::make('Detail Target Tabungan')
                     ->schema([
                         TextEntry::make('wallet.display_name')
-                            ->label('Wallet'),
+                            ->label('Rekening'),
                         TextEntry::make('name')
                             ->label('Nama Target'),
                         TextEntry::make('target_amount')

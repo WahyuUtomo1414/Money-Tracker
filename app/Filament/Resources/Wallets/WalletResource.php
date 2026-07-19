@@ -30,11 +30,11 @@ class WalletResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Master Data';
 
-    protected static ?string $navigationLabel = 'Wallet';
+    protected static ?string $navigationLabel = 'Rekening';
 
-    protected static ?string $modelLabel = 'Wallet';
+    protected static ?string $modelLabel = 'Rekening';
 
-    protected static ?string $pluralModelLabel = 'Wallet';
+    protected static ?string $pluralModelLabel = 'Rekening';
 
     protected static ?string $recordTitleAttribute = 'account_name';
 
@@ -52,10 +52,10 @@ class WalletResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Detail Wallet')
+                Section::make('Detail Rekening')
                     ->schema([
                         TextEntry::make('display_name')
-                            ->label('Wallet'),
+                            ->label('Rekening'),
                         TextEntry::make('category.name')
                             ->label('Kategori'),
                         TextEntry::make('account_no')
