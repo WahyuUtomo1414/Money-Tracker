@@ -1,56 +1,60 @@
 @php
     $state = $getState();
     $imageUrl = filled($state) ? \Illuminate\Support\Facades\Storage::disk('public')->url($state) : null;
+    $dialogId = 'proof-image-preview-' . uniqid();
 @endphp
 
 @if ($imageUrl)
-    <div x-data="{ open: false }">
+    <div>
         <button
             type="button"
-            class="group block overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-            x-on:click="open = true"
+            onclick="document.getElementById('{{ $dialogId }}').showModal()"
+            style="display: block; overflow: hidden; width: 100%; max-width: 420px; border: 1px solid #e5e7eb; border-radius: 12px; background: #ffffff; box-shadow: 0 1px 2px rgba(15, 23, 42, .08); cursor: pointer;"
         >
             <img
                 src="{{ $imageUrl }}"
                 alt="Bukti Gambar"
-                class="h-44 w-full max-w-md object-cover transition duration-200 group-hover:scale-[1.02]"
+                style="display: block; width: 100%; height: 180px; object-fit: cover;"
             >
         </button>
 
-        <div
-            x-cloak
-            x-show="open"
-            x-transition.opacity
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
-            x-on:keydown.escape.window="open = false"
+        <dialog
+            id="{{ $dialogId }}"
+            style="width: min(92vw, 920px); max-height: 90vh; border: 0; border-radius: 16px; padding: 16px; box-shadow: 0 24px 80px rgba(15, 23, 42, .32);"
         >
-            <button
-                type="button"
-                class="absolute inset-0"
-                aria-label="Tutup preview bukti gambar"
-                x-on:click="open = false"
-            ></button>
+            <style>
+                #{{ $dialogId }} {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    margin: 0;
+                }
 
-            <div class="relative z-10 max-h-[90vh] max-w-5xl overflow-hidden rounded-2xl bg-white p-4 shadow-2xl">
-                <div class="mb-3 flex items-center justify-between gap-4">
-                    <p class="text-sm font-semibold text-gray-950">Bukti Gambar</p>
+                #{{ $dialogId }}::backdrop {
+                    background: rgba(15, 23, 42, .72);
+                }
+            </style>
 
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px;">
+                <strong style="font-size: 14px; color: #0f172a;">Bukti Gambar</strong>
+
+                <form method="dialog">
                     <button
-                        type="button"
-                        class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
-                        x-on:click="open = false"
+                        type="submit"
+                        style="border: 0; border-radius: 8px; padding: 8px 12px; color: #475569; background: #f1f5f9; cursor: pointer;"
                     >
                         Tutup
                     </button>
-                </div>
-
-                <img
-                    src="{{ $imageUrl }}"
-                    alt="Bukti Gambar"
-                    class="max-h-[78vh] w-auto max-w-full rounded-xl object-contain"
-                >
+                </form>
             </div>
-        </div>
+
+            <img
+                src="{{ $imageUrl }}"
+                alt="Bukti Gambar"
+                style="display: block; max-width: 100%; max-height: 76vh; margin: 0 auto; border-radius: 12px; object-fit: contain;"
+            >
+        </dialog>
     </div>
 @else
     <span class="text-sm text-gray-500">-</span>
