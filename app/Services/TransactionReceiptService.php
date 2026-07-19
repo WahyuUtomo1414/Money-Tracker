@@ -12,7 +12,10 @@ class TransactionReceiptService
         protected TransactionPdfService $transactionPdfService,
     ) {}
 
-    public function sendCreatedReceipt(Transaction $transaction): void
+    /**
+     * @return array<int, string>
+     */
+    public function sendCreatedReceipt(Transaction $transaction): array
     {
         $transaction->loadMissing(['wallet.users', 'category', 'goal', 'createdBy']);
 
@@ -23,11 +26,13 @@ class TransactionReceiptService
             ->all() ?? [];
 
         if (empty($recipients)) {
-            return;
+            return [];
         }
 
         $pdf = $this->transactionPdfService->generate($transaction);
 
         Mail::to($recipients)->send(new TransactionCreatedMail($transaction, $pdf));
+
+        return $recipients;
     }
 }

@@ -274,4 +274,10 @@
     .text-sm.text-red-600 {
         color: #ef4444 !important;
     }
+
+    /* Login/Register page logo override (swap to black logo and clean size) */
+    .fi-simple-layout .fi-logo {
+        content: url('{{ asset('images/logo1.png') }}') !important;
+        height: 2.2rem !important;
+    }
 </style>

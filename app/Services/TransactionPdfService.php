@@ -15,6 +15,8 @@ class TransactionPdfService
      */
     public function generate(Transaction $transaction): array
     {
+        ini_set('memory_limit', '512M');
+
         $transaction->loadMissing(['wallet', 'category', 'goal', 'createdBy']);
 
         $directory = storage_path('app/private/transactions/pdf');
@@ -42,6 +44,11 @@ class TransactionPdfService
     protected function buildPayload(Transaction $transaction): array
     {
         $transactionType = TransactionTypeEnum::from((string) $transaction->transaction_type);
+        $isExpense = $transactionType === TransactionTypeEnum::Payment;
+        $amountColor = $isExpense ? '#e11d48' : '#059669';
+        $statusText = $isExpense ? 'Pengeluaran' : 'Pemasukan';
+        $statusBg = $isExpense ? '#ffe4e6' : '#dcfce7';
+        $statusColor = $isExpense ? '#9f1239' : '#166534';
 
         return [
             'app_name' => 'Money Tracker',
@@ -49,6 +56,10 @@ class TransactionPdfService
             'transaction_date' => $transaction->transaction_date?->format('d M Y') ?? '-',
             'transaction_type' => $transactionType->label(),
             'amount' => 'Rp ' . number_format((float) $transaction->amount, 0, ',', '.'),
+            'amount_color' => $amountColor,
+            'status_text' => $statusText,
+            'status_bg' => $statusBg,
+            'status_color' => $statusColor,
             'wallet_name' => $transaction->wallet?->display_name ?? '-',
             'category_name' => $transaction->category?->name ?? '-',
             'goal_name' => $transaction->goal?->name ?? '-',

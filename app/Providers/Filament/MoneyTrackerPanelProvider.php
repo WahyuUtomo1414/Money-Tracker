@@ -30,6 +30,8 @@ class MoneyTrackerPanelProvider extends PanelProvider
             ->id('money-tracker')
             ->path('money-tracker')
             ->brandName('Money Tracker')
+            ->brandLogo(asset('images/logo2.png'))
+            ->brandLogoHeight('1.6rem')
             ->login()
             ->registration(Register::class)
             ->colors([
