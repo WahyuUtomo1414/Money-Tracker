@@ -33,6 +33,7 @@ class MoneyTrackerPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo2.png'))
             ->brandLogoHeight('1.6rem')
             ->login()
+            ->favicon('images/logo3.png')
             ->registration(Register::class)
             ->colors([
                 'primary' => \Filament\Support\Colors\Color::hex('#112E81'),
