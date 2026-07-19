@@ -54,6 +54,10 @@ app/
 ├── Services/
 │   ├── TransactionNumberService.php
 │   ├── TransactionPostingService.php
+│   ├── TransactionLedgerService.php
+│   ├── TransactionScopeService.php
+│   ├── TransactionPdfService.php
+│   ├── TransactionReceiptService.php
 │   └── WalletBalanceService.php
 ├── Actions/
 │   └── Transactions/
@@ -142,6 +146,33 @@ Tanggung jawab:
 - `delete`: menghapus ledger berdasarkan `ref_id`, lalu menghitung ulang saldo transaksi setelahnya.
 - Recalculation dibatasi pada wallet terkait agar tidak memindai semua transaksi lintas wallet.
 
+#### TransactionScopeService
+
+Tanggung jawab:
+
+- Menjadi pusat aturan pembatasan data.
+- Super admin dapat melihat seluruh data.
+- User biasa hanya dapat melihat data yang dibuat sendiri atau data yang terkait wallet yang di-assign melalui `users_wallet`.
+- Scope dipakai pada `Wallet`, `Goal`, `Transaction`, dan `TransactionLedger`.
+
+#### TransactionPdfService
+
+Tanggung jawab:
+
+- Generate PDF bukti transaksi memakai DomPDF.
+- Menyiapkan payload transaksi untuk view PDF.
+- Menyimpan file PDF ke storage private agar dapat dilampirkan ke email.
+- Tidak boleh memasukkan asset gambar berukuran besar secara mentah ke DomPDF karena berisiko memory exhausted.
+
+#### TransactionReceiptService
+
+Tanggung jawab:
+
+- Mengirim email bukti transaksi.
+- Melampirkan PDF hasil `TransactionPdfService`.
+- Menentukan penerima email dari user yang di-assign ke wallet transaksi.
+- Dipakai saat create transaksi dan action kirim email ulang di halaman detail transaksi.
+
 ## 5. Rekomendasi Struktur Filament
 
 Filament akan dipakai sebagai backoffice utama.
@@ -153,6 +184,7 @@ Resource minimal:
 - `WalletResource`
 - `GoalResource`
 - `TransactionResource`
+- `TransactionLedgerResource`
 
 Pada `TransactionResource`, form sebaiknya memiliki field:
 
@@ -166,6 +198,14 @@ Pada `TransactionResource`, form sebaiknya memiliki field:
 - image
 
 Field `transaction_no` tidak perlu diinput manual, cukup tampil sebagai readonly setelah record dibuat.
+
+Halaman detail transaksi perlu menyediakan:
+
+- infolist/detail transaksi,
+- card audit transaksi,
+- preview bukti gambar dengan popup,
+- action PDF,
+- action kirim email ulang.
 
 ## 6. Rekomendasi Alur Create Transaction
 
@@ -204,3 +244,5 @@ App\Filament\Resources\TransactionResource
 - Dashboard Filament dapat ditambah widget saldo per wallet.
 - Grafik pemasukan dan pengeluaran bulanan bisa ditambahkan setelah flow transaksi stabil.
 - Bila user bertambah dan permission makin detail, bisa ditambah Filament Shield atau policy Laravel.
+- Logo aplikasi tersedia dalam varian teks gelap dan putih. Gunakan varian putih pada background gelap, dan varian gelap pada background terang.
+- Untuk PDF, gunakan logo yang sudah diperkecil/dioptimalkan agar DomPDF tidak memuat image 5000x5000.

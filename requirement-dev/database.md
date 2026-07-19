@@ -279,3 +279,8 @@ Schema::create('transaction_ledger', function (Blueprint $table) {
 - Ledger sebaiknya diperlakukan sebagai turunan dari tabel `transaction`, bukan input manual terpisah.
 - Saat transaksi diubah atau dihapus, sistem perlu menghitung ulang `last_amount` dan `end_amount` untuk ledger setelah titik perubahan pada wallet terkait.
 - Jika transaksi nanti bisa transfer antar wallet, struktur ledger masih bisa dipakai, tetapi flow posting perlu diperluas.
+- Relasi `users_wallet` dipakai untuk pembatasan akses data dan penerima email transaksi.
+- Query data untuk user biasa harus memakai aturan `created_by = auth()->id()` atau `wallet_id` termasuk wallet yang di-assign ke user.
+- Test yang memakai `RefreshDatabase` harus dijalankan pada environment `testing` dengan SQLite memory, bukan database MySQL lokal.
+- Hindari menjalankan `migrate:fresh`, `migrate:fresh --seed`, atau `db:wipe` pada database lokal yang berisi data kerja tanpa backup.
+- Buat backup sebelum reset database: `mysqldump -h 127.0.0.1 -P 3306 -u root money-tracker > ~/Downloads/money-tracker-backup.sql`.

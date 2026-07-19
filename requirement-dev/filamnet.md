@@ -8,8 +8,7 @@ Scope tahap ini:
 
 - generate resource memakai command artisan,
 - fokus pada **resource, form, dan table**,
-- default **tidak** memakai `view page`,
-- default **tidak** memakai `infolist`,
+- memakai `view page` dan `infolist` untuk resource yang membutuhkan detail audit,
 - resource mengikuti pola struktur Filament yang modular dan rapi.
 
 Catatan:
@@ -169,20 +168,19 @@ Pengecualian:
 
 - `TransactionLedger` hanya memakai `List`
 
-Page yang **tidak dipakai**:
+Page yang awalnya tidak dipakai, tetapi kini dipakai pada resource yang membutuhkan detail:
 
 - `View`
 
-Komponen yang **tidak dipakai**:
+Komponen yang dipakai pada halaman detail:
 
 - `Infolist`
 
-Artinya setelah generate, file berikut nanti akan dibuang atau tidak dipakai:
+Catatan:
 
-- `Pages/View...`
-- `Schemas/...Infolist.php`
-- method `infolist()`
-- route `'view' => ...`
+- `TransactionResource` memakai view page untuk detail transaksi, audit, bukti gambar, PDF, dan action kirim email.
+- `WalletResource` dan `GoalResource` dapat memakai view page bila dibutuhkan untuk audit/detail data.
+- `TransactionLedgerResource` tetap readonly dan hanya memakai list.
 
 Khusus `TransactionLedger`:
 
@@ -451,8 +449,24 @@ Catatan:
 - Nama tabel saat ini mengikuti keputusan repo: `users` dan `goals` tetap plural, sedangkan tabel domain lain diarahkan ke nama singular seperti `category`, `wallet`, `transaction`, dan `transaction_ledger`.
 - Resource `TransactionLedger` tetap dibuat, tetapi hanya sebagai readonly table resource.
 - Resource `UserWallet` tidak perlu dibuat karena hanya pivot relasi.
+- Semua label UI wajib menggunakan bahasa Indonesia.
+- `Wallet`, `Goal`, `Transaction`, dan `TransactionLedger` wajib memakai scope data berdasarkan pembuat data atau wallet yang di-assign ke user.
+- Super admin dapat melihat seluruh data.
+- User biasa hanya melihat data yang dibuat sendiri atau data dari wallet yang di-assign.
+- `TransactionResource` wajib memiliki action PDF dan action `Kirim Email` pada halaman detail.
+- Bukti gambar transaksi wajib tampil di detail dan dapat dibuka melalui popup preview.
+- Email transaksi dikirim ke semua user yang di-assign ke wallet transaksi.
+- Logo Filament memakai varian sesuai background: teks putih untuk background gelap dan teks gelap untuk background terang.
+- Logo email/PDF harus menggunakan asset yang sudah dioptimasi agar tidak memicu memory error pada DomPDF.
 
-## 14. Urutan Pengerjaan Yang Direkomendasikan
+## 14. Catatan Aman Testing dan Database
+
+- `RefreshDatabase` boleh dipakai hanya jika test berjalan pada `APP_ENV=testing` dan database testing bukan MySQL lokal kerja.
+- Konfigurasi test yang disarankan adalah SQLite memory melalui `phpunit.xml`.
+- Jangan menjalankan `php artisan test` jika environment override mengarah ke database MySQL lokal yang berisi data kerja.
+- Command `migrate:fresh`, `migrate:fresh --seed`, dan `db:wipe` hanya boleh dijalankan setelah backup database.
+
+## 15. Urutan Pengerjaan Yang Direkomendasikan
 
 Urutan implementasi resource yang disarankan:
 

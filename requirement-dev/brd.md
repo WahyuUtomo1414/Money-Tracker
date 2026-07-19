@@ -34,12 +34,16 @@ Fitur yang masuk fase awal:
 - Input transaksi.
 - Pencatatan ledger saldo wallet.
 - Upload bukti gambar transaksi bila diperlukan.
+- Preview bukti gambar transaksi pada halaman detail.
+- Generate PDF bukti transaksi.
+- Pengiriman email bukti transaksi beserta lampiran PDF.
+- Kirim ulang email bukti transaksi dari halaman detail transaksi.
 - Monitoring histori transaksi dan saldo akhir.
 
 Fitur yang belum menjadi fokus fase awal:
 
 - Integrasi bank atau e-wallet API.
-- Notifikasi WhatsApp, email, atau push.
+- Notifikasi WhatsApp atau push.
 - Approval workflow.
 - Multi-currency.
 - Export laporan kompleks.
@@ -154,6 +158,7 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - Sistem dapat menghubungkan user ke wallet.
 - Satu user dapat memiliki lebih dari satu wallet.
 - Satu wallet dapat dikaitkan ke lebih dari satu user bila diperlukan.
+- Relasi `users_wallet` menjadi dasar pembatasan akses data dan penerima email transaksi.
 
 ### 6.5 Goals
 
@@ -171,6 +176,10 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - `category_id` bersifat opsional.
 - `goal_id` bersifat opsional.
 - Gambar bukti transaksi dapat disimpan pada kolom `image`.
+- Sistem menampilkan bukti gambar pada halaman detail dan dapat membuka preview gambar.
+- Sistem menyediakan action PDF pada transaksi.
+- Sistem menyediakan action kirim email pada halaman detail transaksi.
+- Saat transaksi dibuat atau email dikirim ulang, penerima email diambil dari user yang di-assign ke wallet transaksi.
 
 ### 6.7 Ledger
 
@@ -199,6 +208,10 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - Category boleh kosong pada transaksi yang belum perlu klasifikasi detail.
 - Ledger hanya boleh dibuat oleh proses sistem, bukan input manual user.
 - Hubungan transaksi ke ledger menggunakan `transaction.id -> transaction_ledger.ref_id`.
+- Super admin dapat melihat semua data.
+- User biasa hanya dapat melihat data yang dibuat sendiri atau data dari wallet yang di-assign ke user tersebut.
+- Email bukti transaksi dikirim ke pemegang wallet, bukan hanya pembuat transaksi.
+- Jika wallet belum memiliki user dengan email, sistem tidak mengirim email dan harus menampilkan notifikasi warning.
 
 ## 9. Asumsi Awal
 
@@ -212,3 +225,5 @@ Dengan ledger, sistem dapat melakukan audit histori saldo dan mengurangi risiko 
 - Tabel `category` saat ini dipakai untuk lebih dari satu konteks, sehingga perlu aturan `type` yang jelas.
 - Tabel `transaction_ledger` membutuhkan logika saldo yang konsisten agar tidak terjadi mismatch.
 - Perubahan transaksi lama dapat memengaruhi saldo semua transaksi setelahnya pada wallet yang sama, sehingga recalculation ledger wajib konsisten.
+- PDF memakai DomPDF. Asset gambar resolusi besar, termasuk logo 5000x5000 atau bukti transaksi besar, dapat menyebabkan memory exhausted saat render PDF.
+- Logo untuk email/PDF/Filament harus memakai varian warna yang sesuai background dan sebaiknya memakai versi kecil/optimized untuk PDF.
